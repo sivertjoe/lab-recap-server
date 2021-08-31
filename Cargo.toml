@@ -11,3 +11,7 @@ tiny_http = "0.8.0"
 serde_json = "*"
 serde_derive = "*"
 serde = "*"
+reqwest = { version = "*", features = ["blocking", "json"] }
+dotenv_codegen = "*"
+dotenv = "*"
+lazy_static = "*"
