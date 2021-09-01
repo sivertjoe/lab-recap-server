@@ -18,7 +18,11 @@ impl Http for Client
             .map(|mut map| map.remove("comments").unwrap())
             .unwrap();
 
-        let resp = tiny_http::Response::from_string(format!("{{ comments: {:?}}}", comments));
+        let mut resp = tiny_http::Response::from_string(
+            format!("{{ \"comments\": {:?}}}", comments));
+
+        crate::add_cors_headers_xd(&mut resp);
+
         request.respond(resp).expect("Responding");
     }
 
@@ -30,7 +34,8 @@ impl Http for Client
             .body(comment)
             .send()
             .unwrap();
-        let resp = tiny_http::Response::empty(200);
+        let mut resp = tiny_http::Response::empty(200);
+        crate::add_cors_headers_xd(&mut resp);
         request.respond(resp).expect("Responding");
     }
 }

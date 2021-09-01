@@ -19,6 +19,21 @@ lazy_static! {
     };
 }
 
+fn add_cors_headers_xd<T>(resp: &mut tiny_http::Response<T>)
+    where T: std::io::Read
+{
+    let header = tiny_http::Header::from_bytes(
+        &b"Access-Control-Allow-Headers"[..], 
+        &b"Content-Type"[..]).unwrap();
+    resp.add_header(header);
+
+    let header = tiny_http::Header::from_bytes(
+        &b"Access-Control-Allow-Origin"[..], 
+        &b"*"[..]).unwrap();
+    resp.add_header(header);
+}
+
+
 fn main()
 {
     let (handler, addr): (Box<dyn http::Http>, &String) =
@@ -47,7 +62,12 @@ fn server(handler: Box<dyn http::Http>, addr: &String)
                 {
                     handler.get(request);
                 },
-
+                &tiny_http::Method::Options  => 
+                {
+                    let mut resp = tiny_http::Response::empty(200);
+                    add_cors_headers_xd(&mut resp);
+                    request.respond(resp).expect("Responding");
+                },
                 &tiny_http::Method::Post =>
                 {
                     handler.post(request);
